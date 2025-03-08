@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: MediLinkSpring
+  config:
+    import: optional:file:.env[.properties]
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+
+logging:
+  level:
+    org.example.medilinkspring: DEBUG

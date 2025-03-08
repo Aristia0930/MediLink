@@ -3,7 +3,7 @@ package org.example.medilinkspring.config;
 import lombok.RequiredArgsConstructor;
 import org.example.medilinkspring.config.security.jwt.JwtAuthenticationFilter;
 import org.example.medilinkspring.config.security.jwt.JwtAuthorizationFilter;
-import org.example.medilinkspring.user.UserRepository;
+import org.example.medilinkspring.user.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

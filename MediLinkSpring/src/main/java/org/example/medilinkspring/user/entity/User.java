@@ -1,4 +1,4 @@
-package org.example.medilinkspring.user;
+package org.example.medilinkspring.user.entity;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

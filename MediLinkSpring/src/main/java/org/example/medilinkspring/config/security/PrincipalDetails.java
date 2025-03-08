@@ -1,7 +1,7 @@
 package org.example.medilinkspring.config.security;
 
 import lombok.Data;
-import org.example.medilinkspring.user.User;
+import org.example.medilinkspring.user.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

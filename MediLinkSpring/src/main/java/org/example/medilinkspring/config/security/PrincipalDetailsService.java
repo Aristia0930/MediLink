@@ -2,8 +2,8 @@ package org.example.medilinkspring.config.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.medilinkspring.user.User;
-import org.example.medilinkspring.user.UserRepository;
+import org.example.medilinkspring.user.entity.User;
+import org.example.medilinkspring.user.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

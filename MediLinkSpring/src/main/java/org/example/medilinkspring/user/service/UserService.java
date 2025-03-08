@@ -1,5 +1,7 @@
-package org.example.medilinkspring.user;
+package org.example.medilinkspring.user.service;
 
+import org.example.medilinkspring.user.entity.User;
+import org.example.medilinkspring.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

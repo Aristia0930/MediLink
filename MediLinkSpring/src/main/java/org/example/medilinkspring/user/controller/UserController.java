@@ -1,8 +1,9 @@
-package org.example.medilinkspring.user;
+package org.example.medilinkspring.user.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.medilinkspring.user.entity.User;
+import org.example.medilinkspring.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

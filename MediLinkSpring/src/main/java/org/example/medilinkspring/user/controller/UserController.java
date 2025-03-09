@@ -22,13 +22,5 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @PostMapping
-    public User createUser(@RequestBody User user) {
-        log.debug("유저생성 접급 {}",user );
-        return userService.createUser(user);
-    }
-
-
-
 
 }

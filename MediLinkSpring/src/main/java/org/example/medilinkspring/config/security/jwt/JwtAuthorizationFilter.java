@@ -2,6 +2,7 @@ package org.example.medilinkspring.config.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import java.io.IOException;
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
+    private final Dotenv dotenv = Dotenv.load();
 
     private UserRepository userRepository;
 
@@ -46,8 +48,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         //받은 토큰으로 정상적인 사용자 인지 확인한다.
         String jwtToken = request.getHeader("Authorization").replace("Bearer ", ""); //토큰만 꺼내기
-
-        String username = JWT.require(Algorithm.HMAC512("code")).build().verify(jwtToken)
+        String jwtSecret = dotenv.get("JWT_VALUE");
+        String username = JWT.require(Algorithm.HMAC512(jwtSecret)).build().verify(jwtToken)
                 .getClaim("username").asString();
 
         if (username != null) {

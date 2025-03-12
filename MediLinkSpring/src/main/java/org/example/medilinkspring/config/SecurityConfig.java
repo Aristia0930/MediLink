@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable()) // HTTP Basic 인증 비활성화
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/user/**").hasAnyRole("USER","MANAGER", "ADMIN")
+//                                .requestMatchers("/api/hos/**").hasAnyRole("USER","MANAGER", "ADMIN")
                                 .anyRequest().permitAll() // 그 외 경로는 인증 없이 접근
                 )
                 .build();

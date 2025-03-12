@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
@@ -30,5 +31,11 @@ public class AuthController {
     @PostMapping("/login")
     public String lgoin() {
         return "로그인완료";
+    }
+
+    //아이디 중복확인
+    @PostMapping("/idcheck")
+    public boolean  idCheck(@RequestParam String username){
+        return userService.idCheck(username);
     }
 }

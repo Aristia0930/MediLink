@@ -20,4 +20,16 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    public boolean idCheck(String username){
+        User user=userRepository.findByName(username);
+        if (user==null){
+
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.medilinkspring.user.entity.User;
 import org.example.medilinkspring.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,15 @@ public class UserController {
 
         return userService.getAllUsers();
     }
+
+    //유저 유효한지 확인
+    @GetMapping("/check")
+    public ResponseEntity<Void> userCheck(){
+        log.debug("유저토근 유효검사");
+        return ResponseEntity.ok().build();
+    }
+
+
 
 
 }

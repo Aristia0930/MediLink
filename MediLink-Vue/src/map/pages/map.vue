@@ -86,6 +86,7 @@ function accessToGeo (position) {
 
 function askForLocation () {
     navigator.geolocation.getCurrentPosition(accessToGeo)
+
 }
 
 function updateMarkers(map, markers) {
@@ -113,8 +114,10 @@ function hideMarker(map, marker) {
 
 onMounted(async () => {
 
-await askForLocation();
+askForLocation();
 console.log(positionObj)
+
+// 아래를 마운트 되어 위치를 받게 되면 update에 넣어야 함  수정 필요!!
 const naver = await loadNaverMap(); // 네이버 지도 API 로드 완료 후 실행
 
 const map = new naver.maps.Map(mapRef.value, {

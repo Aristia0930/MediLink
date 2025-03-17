@@ -4,7 +4,7 @@
 
 <script setup>
 /* eslint-disable no-unused-vars */
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import axios from '@/util/http';
 
 const mapRef = ref(null);
@@ -117,11 +117,21 @@ onMounted(async () => {
 askForLocation();
 console.log(positionObj)
 
-// 아래를 마운트 되어 위치를 받게 되면 update에 넣어야 함  수정 필요!!
+});
+
+console.log(positionObj.value.latitude)
+console.log(positionObj.value.longitude)
+
+watch(positionObj, async (newValue, oldValue) => {
+  console.log("positionObj 값이 변경되었습니다:");
+  console.log("이전 값:", oldValue);
+  console.log("새로운 값:", newValue);
+ 
+  // 아래를 마운트 되어 위치를 받게 되면 update에 넣어야 함  수정 필요!!
 const naver = await loadNaverMap(); // 네이버 지도 API 로드 완료 후 실행
 
 const map = new naver.maps.Map(mapRef.value, {
-    center: new naver.maps.LatLng(37.5670135, 126.9783740),
+    center: new naver.maps.LatLng(positionObj.value.latitude, positionObj.value.longitude),
     // center: new naver.maps.LatLng(positionObj.value.latitude, positionObj.value.longitude),
     zoom: 15,     // 초기 줌
     minZoom: 7,   // 최소 줌
@@ -152,7 +162,8 @@ naver.maps.Event.addListener(map, 'idle', function () {
     updateMarkers(map, markers);
 });
 
-});
+
+}, { deep: true });
 
 </script>
 

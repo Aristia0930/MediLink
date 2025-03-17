@@ -112,10 +112,27 @@ function hideMarker(map, marker) {
     marker.setMap(null);
 }
 
+// 병원 정보를 조회함
+const location = ref([])
+
+function getHospital(){
+  axios
+  .get("http://localhost:8080/api/hos/gethospitals?x=128.4210688&y=36.1037824")
+  .then((response) => {
+    location.value = response.data.details
+  })
+  .catch((error) => {
+    console.log("조회 실패" + error);
+  })
+}
+
 onMounted(async () => {
 
 askForLocation();
 console.log(positionObj)
+
+getHospital();
+console.log(location)
 
 });
 

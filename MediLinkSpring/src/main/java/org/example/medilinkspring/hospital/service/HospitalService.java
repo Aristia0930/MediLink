@@ -3,10 +3,13 @@ package org.example.medilinkspring.hospital.service;
 import com.google.gson.Gson;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
+import org.example.medilinkspring.exception.ErrorCode;
+import org.example.medilinkspring.exception.customexception.HospitalException;
 import org.example.medilinkspring.hospital.dto.HospitalResponse;
 import org.example.medilinkspring.hospital.entity.Hospital;
 import org.example.medilinkspring.hospital.repository.HospitalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -100,12 +103,22 @@ public class HospitalService {
         return "저장성공";
     }
 
-    public List<Hospital> getHospitals(double x,double y){
+    public List<Hospital> getHospitals(double x,double y) throws HospitalException {
         double minLat=y-0.0053;
         double maxLat=y+0.0053;
 
         double minLon=x-0.0053;
         double maxLon=x+0.0053;
+        if (122> x || x>133 || 30>y || y>39){
+            throw new HospitalException(ErrorCode.COORDINATE_NOT_KOREA);
+        }
+
+        try {
+            List<Hospital> hospitals=hospitalRepository.findHospitalsInRange(minLat,maxLat,minLon,maxLon);
+        }catch (Exception e){
+            throw new HospitalException(ErrorCode.HOSPITAL_NOT_FOUND,e);
+        }
+
         return hospitalRepository.findHospitalsInRange(minLat,maxLat,minLon,maxLon);
 
     }

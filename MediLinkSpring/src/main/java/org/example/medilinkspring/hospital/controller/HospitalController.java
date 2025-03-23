@@ -38,7 +38,9 @@ public class HospitalController {
         log.debug("getHospitals 접근 x:{} y:{}",x,y);
         List<Hospital> hospitals=hospitalService.getHospitals(x,y);
         log.debug("주변 병원 count {}",hospitals.size());
+
         return ResponseEntity.ok(hospitals);
+
     }
 
 

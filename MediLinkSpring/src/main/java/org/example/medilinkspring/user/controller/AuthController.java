@@ -5,12 +5,13 @@ import org.example.medilinkspring.user.entity.User;
 import org.example.medilinkspring.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
 @Slf4j
 @RestController
+@RequestMapping("/public")
 public class AuthController {
     //로그인 , 회원가입 서비스
 
@@ -35,7 +36,9 @@ public class AuthController {
 
     //아이디 중복확인
     @PostMapping("/idcheck")
-    public boolean  idCheck(@RequestParam String username){
+    public boolean  idCheck(@RequestBody Map<String, String> requestBody){
+        String username = requestBody.get("username");
+        System.out.println(username);
         return userService.idCheck(username);
     }
 }

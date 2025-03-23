@@ -23,6 +23,7 @@ public class UserService {
 
     public boolean idCheck(String username){
         User user=userRepository.findByName(username);
+        System.out.println(user);
         if (user==null){
 
             return true;

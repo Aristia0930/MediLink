@@ -22,14 +22,15 @@ function userValue(){
 function getHospital(){
     axios.get(`/api/hos/gethospitals?x=128.4210688&y=36.1037824`).then(rs=>{
         console.log(rs.data)
-        console.log("들어옴")
+        location.value = rs.data
     }).catch(error=>{
         console.error(error)
     })
 }
 
 function check(){
-    console.log(location.value)
+    console.log(location.value.at(0).xpos)
+    console.log(location.value.at(0).ypos)
 }
 
 </script>

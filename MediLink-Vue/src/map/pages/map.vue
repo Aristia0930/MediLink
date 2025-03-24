@@ -10,53 +10,9 @@ import axios from '@/util/http';
 const mapRef = ref(null);
 
 // 위치 정보 저장용 ref
-const positionObj = ref({
-  latitude: null,
-  longitude: null,
-});
+const positionObj = ref({ latitude: 36.1037824, longitude: 128.4210688 }); // 기본값 추가
 
-// 여러 개의 마커 좌표 배열
-const markerData = [
-  { lat: 37.5670135, lng: 126.9783740 }, // 서울
-  { lat: 37.3595704, lng: 127.105399 },  // 분당
-  { lat: 35.1795543, lng: 129.0756416 }, // 부산
-];
-
-// 마커 보일 영억을 지정
-var HOME_PATH = window.HOME_PATH || '.';
-var MARKER_SPRITE_X_OFFSET = 29,
-    MARKER_SPRITE_Y_OFFSET = 50,
-    MARKER_SPRITE_POSITION = {
-        "A0": [0, 0],
-        "B0": [MARKER_SPRITE_X_OFFSET, 0],
-        "C0": [MARKER_SPRITE_X_OFFSET*2, 0],
-        "D0": [MARKER_SPRITE_X_OFFSET*3, 0],
-        "E0": [MARKER_SPRITE_X_OFFSET*4, 0],
-        "F0": [MARKER_SPRITE_X_OFFSET*5, 0],
-        "G0": [MARKER_SPRITE_X_OFFSET*6, 0],
-        "H0": [MARKER_SPRITE_X_OFFSET*7, 0],
-        "I0": [MARKER_SPRITE_X_OFFSET*8, 0],
-
-        "A1": [0, MARKER_SPRITE_Y_OFFSET],
-        "B1": [MARKER_SPRITE_X_OFFSET, MARKER_SPRITE_Y_OFFSET],
-        "C1": [MARKER_SPRITE_X_OFFSET*2, MARKER_SPRITE_Y_OFFSET],
-        "D1": [MARKER_SPRITE_X_OFFSET*3, MARKER_SPRITE_Y_OFFSET],
-        "E1": [MARKER_SPRITE_X_OFFSET*4, MARKER_SPRITE_Y_OFFSET],
-        "F1": [MARKER_SPRITE_X_OFFSET*5, MARKER_SPRITE_Y_OFFSET],
-        "G1": [MARKER_SPRITE_X_OFFSET*6, MARKER_SPRITE_Y_OFFSET],
-        "H1": [MARKER_SPRITE_X_OFFSET*7, MARKER_SPRITE_Y_OFFSET],
-        "I1": [MARKER_SPRITE_X_OFFSET*8, MARKER_SPRITE_Y_OFFSET],
-
-        "A2": [0, MARKER_SPRITE_Y_OFFSET*2],
-        "B2": [MARKER_SPRITE_X_OFFSET, MARKER_SPRITE_Y_OFFSET*2],
-        "C2": [MARKER_SPRITE_X_OFFSET*2, MARKER_SPRITE_Y_OFFSET*2],
-        "D2": [MARKER_SPRITE_X_OFFSET*3, MARKER_SPRITE_Y_OFFSET*2],
-        "E2": [MARKER_SPRITE_X_OFFSET*4, MARKER_SPRITE_Y_OFFSET*2],
-        "F2": [MARKER_SPRITE_X_OFFSET*5, MARKER_SPRITE_Y_OFFSET*2],
-        "G2": [MARKER_SPRITE_X_OFFSET*6, MARKER_SPRITE_Y_OFFSET*2],
-        "H2": [MARKER_SPRITE_X_OFFSET*7, MARKER_SPRITE_Y_OFFSET*2],
-        "I2": [MARKER_SPRITE_X_OFFSET*8, MARKER_SPRITE_Y_OFFSET*2]
-    };
+const hospitalData = ref([]);
 
 // 네이버 지도 API 로드 함수
 const loadNaverMap = () => {
@@ -78,78 +34,54 @@ const loadNaverMap = () => {
 };
 
 // 현재 위치 받아오기
-function accessToGeo (position) {
-    positionObj.value.latitude = position.coords.latitude;
-    positionObj.value.longitude = position.coords.longitude;
-    // console.log(positionObj.value); // 여기서 위치 객체를 확인할 수 있습니다.
+function accessToGeo(position) {
+  positionObj.value.latitude = position.coords.latitude;
+  positionObj.value.longitude = position.coords.longitude;
 }
 
-function askForLocation () {
-    navigator.geolocation.getCurrentPosition(accessToGeo)
-
+function askForLocation() {
+  navigator.geolocation.getCurrentPosition(accessToGeo);
 }
 
-function updateMarkers(map, markers) {
-    var mapBounds = map.getBounds();
-    for (const marker of markers) {
-        if (mapBounds.hasLatLng(marker.getPosition())) {
-            showMarker(map, marker);
-        } else {
-            hideMarker(map, marker);
-        }
-    }
+// 병원 데이터 가져오기
+function getHospital() {
+  axios.get(`/api/hos/gethospitals?x=128.4210688&y=36.1037824`).then(rs => {
+    hospitalData.value = rs.data;
+  }).catch(error => {
+    console.error(error);
+  });
 }
 
 // 마커를 보이게 함
 function showMarker(map, marker) {
-    if (marker.getMap()) return;
-    marker.setMap(map);
+  if (marker.getMap()) return;
+  marker.setMap(map);
 }
 
 // 마커를 숨김
 function hideMarker(map, marker) {
-    if (!marker.getMap()) return;
-    marker.setMap(null);
+  if (!marker.getMap()) return;
+  marker.setMap(null);
 }
 
-// 병원 정보를 조회함
-const location = ref([])
-
-function getHospital(){
-  axios
-  .get("http://localhost:8080/api/hos/gethospitals?x=128.4210688&y=36.1037824")
-  .then((response) => {
-    location.value = response.data.details
-  })
-  .catch((error) => {
-    console.log("조회 실패" + error);
-  })
+// 마커 업데이트
+function updateMarkers(map, markers) {
+  const mapBounds = map.getBounds();
+  for (const marker of markers) {
+    if (mapBounds.hasLatLng(marker.getPosition())) {
+      showMarker(map, marker);
+    } else {
+      hideMarker(map, marker);
+    }
+  }
 }
 
-onMounted(async () => {
+// 병원 데이터 및 위치 정보가 모두 로드되었을 때 지도를 표시하고 마커를 생성하는 로직
+const renderMapAndMarkers = async () => {
+  const naver = await loadNaverMap();
 
-askForLocation();
-console.log(positionObj)
-
-getHospital();
-console.log(location)
-
-});
-
-console.log(positionObj.value.latitude)
-console.log(positionObj.value.longitude)
-
-watch(positionObj, async (newValue, oldValue) => {
-  console.log("positionObj 값이 변경되었습니다:");
-  console.log("이전 값:", oldValue);
-  console.log("새로운 값:", newValue);
- 
-  // 아래를 마운트 되어 위치를 받게 되면 update에 넣어야 함  수정 필요!!
-const naver = await loadNaverMap(); // 네이버 지도 API 로드 완료 후 실행
-
-const map = new naver.maps.Map(mapRef.value, {
+  const map = new naver.maps.Map(mapRef.value, {
     center: new naver.maps.LatLng(positionObj.value.latitude, positionObj.value.longitude),
-    // center: new naver.maps.LatLng(positionObj.value.latitude, positionObj.value.longitude),
     zoom: 15,     // 초기 줌
     minZoom: 7,   // 최소 줌
     scaleControl: false,
@@ -158,36 +90,51 @@ const map = new naver.maps.Map(mapRef.value, {
     zoomControl: true,
   });
 
-// 마커 객체를 배열로 저장
-const markers = markerData.map((data) => {
-  return new naver.maps.Marker({
-    position: new naver.maps.LatLng(data.lat, data.lng),
-    map: map,
-    title: data.title
+  // 마커 객체 배열로 저장
+  const markers = hospitalData.value.map((data) => {
+    const position = new naver.maps.LatLng(data.ypos, data.xpos); // ypos는 위도, xpos는 경도
+    return new naver.maps.Marker({
+      position: position,
+      map: map,
+      title: data.clCdNm,
+      id: data.id,
+      addr: data.addr
+    });
   });
-});
 
-// 지도의 경계를 구함
-var bounds = map.getBounds(),
-southWest = bounds.getSW(),
-northEast = bounds.getNE(),
-lngSpan = northEast.lng() - southWest.lng(),
-latSpan = northEast.lat() - southWest.lat();
+  // 지도 경계 설정
+  var bounds = map.getBounds(),
+    southWest = bounds.getSW(),
+    northEast = bounds.getNE(),
+    lngSpan = northEast.lng() - southWest.lng(),
+    latSpan = northEast.lat() - southWest.lat();
 
-// 마크를 업데이트
-naver.maps.Event.addListener(map, 'idle', function () {
+  // 마커 보이기/숨기기
+  naver.maps.Event.addListener(map, 'idle', function () {
     updateMarkers(map, markers);
+  });
+};
+
+onMounted(() => {
+  askForLocation();  // 위치 정보 요청
+  getHospital();     // 병원 데이터 요청
 });
 
+watch([positionObj, hospitalData], async (newValues, oldValues) => {
+  const [newPositionObj, newHospitalData] = newValues;
 
+  // 위치 정보와 병원 데이터가 모두 로드되었을 때만 지도와 마커를 렌더링
+  if (newPositionObj.latitude && newPositionObj.longitude && newHospitalData.length > 0) {
+    console.log('데이터 변경 감지, 지도 및 마커 렌더링');
+    await renderMapAndMarkers();
+  }
 }, { deep: true });
-
 </script>
 
 <style scoped>
 #map {
   width: 100vw;
   height: 100vh;
-  background-color: lightgray; /* 배경색 추가 */
+  background-color: lightgray;
 }
 </style>

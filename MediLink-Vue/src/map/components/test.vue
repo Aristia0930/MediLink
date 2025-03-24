@@ -22,14 +22,20 @@ function userValue(){
 function getHospital(){
     axios.get(`/api/hos/gethospitals?x=128.4210688&y=36.1037824`).then(rs=>{
         console.log(rs.data)
+        console.log("들어옴")
     }).catch(error=>{
         console.error(error)
     })
 }
 
+function check(){
+    console.log(location.value)
+}
+
 </script>
 
 <template>
+  <div>
   <h1>테스트</h1>   
 
   <!-- 🔹 토큰 입력 필드 -->
@@ -39,7 +45,8 @@ function getHospital(){
   <button @click="userValue">유저정보 반환 번트 인증 필요</button> 
   <br>
   <button @click="getHospital">병원 정보 반환</button> 
-
+  <button @click="check">병원 정보 확인</button> 
+  </div>
 </template>
 
 <style scoped>

@@ -22,7 +22,7 @@ const checkId= ()=>{
     else{
         idCheckMessage.value=""
 
-        axios.post("/public/idcheck",{username : form.value.name}).then(rs=>{
+        axios.post("/idcheck",{username : form.value.name}).then(rs=>{
             if(rs.data==true){
                 isIdValid.value=true
                 idCheckMessage.value="사용가능한 아이디 입니다."
@@ -39,8 +39,8 @@ const checkId= ()=>{
 }
 
 const handleSubmit=()=>{
-    if (isIdValid){
-        axios.post("/public/join",{
+    if (isIdValid.value){
+        axios.post("/join",{
             name: form.value.name,
             password: form.value.password,
             phone: form.value.phone,

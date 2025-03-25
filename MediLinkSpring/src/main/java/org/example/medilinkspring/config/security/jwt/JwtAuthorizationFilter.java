@@ -32,7 +32,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (request.getRequestURI().startsWith("/public")) {
+        if (request.getRequestURI().startsWith("/idcheck")||request.getRequestURI().startsWith("/join")||request.getRequestURI().startsWith("/login")) {
+
             chain.doFilter(request, response);
             return;
         }

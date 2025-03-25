@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/public")
+
 public class AuthController {
     //로그인 , 회원가입 서비스
 

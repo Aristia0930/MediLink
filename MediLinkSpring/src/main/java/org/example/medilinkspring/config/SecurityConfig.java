@@ -36,14 +36,20 @@ public class SecurityConfig {
 
                 .formLogin(form -> form.disable()) // 폼 로그인 비활성화
                 .httpBasic(basic -> basic.disable()) // HTTP Basic 인증 비활성화
+//                .authorizeHttpRequests(auth -> auth
+//                                .requestMatchers("/api/user/**").hasAnyRole("USER","MANAGER", "ADMIN")
+////                                .requestMatchers("/api/hos/**").hasAnyRole("USER","MANAGER", "ADMIN")
+//                                .requestMatchers("/public/**", "/login", "/signup").permitAll()
+//                                .anyRequest().authenticated()
+//                )
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/api/user/**").hasAnyRole("USER","MANAGER", "ADMIN")
-//                                .requestMatchers("/api/hos/**").hasAnyRole("USER","MANAGER", "ADMIN")
-                                .requestMatchers("/public/**", "/login", "/signup").permitAll()
-                                .anyRequest().permitAll() // 그 외 경로는 인증 없이 접근
+                        .requestMatchers("/idcheck", "/login", "/join").permitAll()  // 인증 없이 접근 가능
+                        .requestMatchers("/api/user/**").hasAnyRole("USER", "MANAGER", "ADMIN")
+                        .anyRequest().authenticated() // 그 외 요청은 인증 필요
                 )
                 .addFilterAt(new JwtAuthenticationFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAt(new JwtAuthorizationFilter(authenticationManager(authenticationConfiguration),userRepository),JwtAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthorizationFilter(authenticationManager(authenticationConfiguration),userRepository),JwtAuthenticationFilter.class)
+//                .addFilterBefore(new JwtAuthorizationFilter(authenticationManager(authenticationConfiguration),userRepository),JwtAuthenticationFilter.class)
                 .build();
 
 

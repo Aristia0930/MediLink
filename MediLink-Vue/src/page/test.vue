@@ -1,7 +1,7 @@
 <script setup>
 import axios from '@/util/http';
 import {ref} from "vue";
-
+import { RouterLink } from 'vue-router'
 const tokenInput = ref("");
 const location = ref([])
 
@@ -47,7 +47,13 @@ function check(){
   <br>
   <button @click="getHospital">병원 정보 반환</button> 
   <button @click="check">병원 정보 확인</button> 
+  <br>
+  <RouterLink to="/login">로그인</RouterLink>
+  <br>
+  <RouterLink to="/signup">회원가입</RouterLink>
   </div>
+  <RouterLink to="/map">지도</RouterLink>
+
 </template>
 
 <style scoped>

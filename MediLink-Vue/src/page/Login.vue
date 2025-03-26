@@ -1,6 +1,9 @@
 <script setup>
 import {ref} from "vue";
 import axios from '@/util/http';
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const form=ref({
     name:"",
@@ -21,6 +24,7 @@ const handleSubmit=()=>{
                 console.log("토큰:", token);
 
                 alert("로그인성공")
+                router.push("/")
             }
 
 

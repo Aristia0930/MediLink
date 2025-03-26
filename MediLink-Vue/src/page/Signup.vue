@@ -1,7 +1,9 @@
 <script setup>
 import {ref} from "vue";
 import axios from '@/util/http';
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const form=ref({
     name:"",
     password:"",
@@ -49,6 +51,7 @@ const handleSubmit=()=>{
         }).then(rs=>{
             if(rs.status==200){
                 alert("회원가입성공")
+                router.push('/')
             }
 
 

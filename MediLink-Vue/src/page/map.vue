@@ -3,18 +3,17 @@
 </template>
 
 <script setup>
-/* eslint-disable no-unused-vars */
 import { ref, onMounted, watch } from "vue";
 import axios from '@/util/http';
 
 const mapRef = ref(null);
-
-// 위치 정보 저장용 ref
-const positionObj = ref({ latitude: 36.1037824, longitude: 128.4210688 }); // 기본값 추가
-
+const positionObj = ref({ latitude: 36.1037824, longitude: 128.4210688 }); // 기본 위치
 const hospitalData = ref([]);
 
-// 네이버 지도 API 로드 함수
+const mapInstance = ref(null);        // ✅ 네이버 지도 객체 저장
+const markerList = ref([]);           // ✅ 마커 리스트 저장
+
+// 네이버 지도 API 로드
 const loadNaverMap = () => {
   return new Promise((resolve) => {
     if (window.naver) {
@@ -23,8 +22,7 @@ const loadNaverMap = () => {
     }
 
     const script = document.createElement("script");
-    script.src =
-      "https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=lamhj6mox4";
+    script.src = "https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=lamhj6mox4";
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
@@ -33,7 +31,7 @@ const loadNaverMap = () => {
   });
 };
 
-// 현재 위치 받아오기
+// 위치 접근
 function accessToGeo(position) {
   positionObj.value.latitude = position.coords.latitude;
   positionObj.value.longitude = position.coords.longitude;
@@ -45,26 +43,30 @@ function askForLocation() {
 
 // 병원 데이터 가져오기
 function getHospital() {
-  axios.get(`/api/hos/gethospitals?x=128.4210688&y=36.1037824`).then(rs => {
-    hospitalData.value = rs.data;
-  }).catch(error => {
-    console.error(error);
-  });
+  // axios.get(`/api/hos/gethospitals?x=128.4210688&y=36.1037824`)
+  axios.get(`/api/hos/gethospitals?x=${positionObj.value.latitude}&y=${positionObj.value.longitude}`)
+    .then(rs => {
+      hospitalData.value = rs.data;
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
 
-// 마커를 보이게 함
+// 마커 표시/숨김 함수
 function showMarker(map, marker) {
-  if (marker.getMap()) return;
-  marker.setMap(map);
+  if (!marker.getMap()) {
+    marker.setMap(map);
+  }
 }
 
-// 마커를 숨김
 function hideMarker(map, marker) {
-  if (!marker.getMap()) return;
-  marker.setMap(null);
+  if (marker.getMap()) {
+    marker.setMap(null);
+  }
 }
 
-// 마커 업데이트
+// 마커 업데이트 (지도 경계 안에 있는 마커만 보이게)
 function updateMarkers(map, markers) {
   const mapBounds = map.getBounds();
   for (const marker of markers) {
@@ -76,58 +78,64 @@ function updateMarkers(map, markers) {
   }
 }
 
-// 병원 데이터 및 위치 정보가 모두 로드되었을 때 지도를 표시하고 마커를 생성하는 로직
-const renderMapAndMarkers = async () => {
+// 지도만 먼저 렌더링
+const renderMap = async () => {
   const naver = await loadNaverMap();
 
-  const map = new naver.maps.Map(mapRef.value, {
+  mapInstance.value = new naver.maps.Map(mapRef.value, {
     center: new naver.maps.LatLng(positionObj.value.latitude, positionObj.value.longitude),
-    zoom: 15,     // 초기 줌
-    minZoom: 7,   // 최소 줌
+    zoom: 15,
+    minZoom: 7,
     scaleControl: false,
     logoControl: false,
     mapDataControl: false,
     zoomControl: true,
   });
 
-  // 마커 객체 배열로 저장
-  const markers = hospitalData.value.map((data) => {
-    const position = new naver.maps.LatLng(data.ypos, data.xpos); // ypos는 위도, xpos는 경도
+  // idle 이벤트로 마커 갱신
+  naver.maps.Event.addListener(mapInstance.value, 'idle', () => {
+    updateMarkers(mapInstance.value, markerList.value);
+  });
+};
+
+// 마커만 렌더링
+const renderMarkers = () => {
+  if (!mapInstance.value || hospitalData.value.length === 0) return;
+
+  // 기존 마커 제거
+  markerList.value.forEach(marker => marker.setMap(null));
+
+  markerList.value = hospitalData.value.map((data) => {
+    const position = new naver.maps.LatLng(data.ypos, data.xpos);
     return new naver.maps.Marker({
-      position: position,
-      map: map,
+      position,
+      map: mapInstance.value,
       title: data.clCdNm,
       id: data.id,
       addr: data.addr
     });
   });
 
-  // 지도 경계 설정
-  var bounds = map.getBounds(),
-    southWest = bounds.getSW(),
-    northEast = bounds.getNE(),
-    lngSpan = northEast.lng() - southWest.lng(),
-    latSpan = northEast.lat() - southWest.lat();
-
-  // 마커 보이기/숨기기
-  naver.maps.Event.addListener(map, 'idle', function () {
-    updateMarkers(map, markers);
-  });
+  // 초기에 한 번 마커 상태 업데이트
+  updateMarkers(mapInstance.value, markerList.value);
 };
 
+// 마운트 시 위치 요청
 onMounted(() => {
-  askForLocation();  // 위치 정보 요청
-  getHospital();     // 병원 데이터 요청
+  askForLocation();
 });
 
-watch([positionObj, hospitalData], async (newValues, oldValues) => {
-  const [newPositionObj, newHospitalData] = newValues;
-
-  // 위치 정보와 병원 데이터가 모두 로드되었을 때만 지도와 마커를 렌더링
-  if (newPositionObj.latitude && newPositionObj.longitude && newHospitalData.length > 0) {
-    console.log('데이터 변경 감지, 지도 및 마커 렌더링');
-    await renderMapAndMarkers();
+// 위치 변경 감지 시 지도 먼저 렌더링, 병원 데이터 요청
+watch(positionObj, async (newVal) => {
+  if (newVal.latitude && newVal.longitude) {
+    await renderMap();
+    getHospital();
   }
+}, { deep: true });
+
+// 병원 데이터 변경 시 마커만 렌더링
+watch(hospitalData, () => {
+  renderMarkers();
 }, { deep: true });
 </script>
 

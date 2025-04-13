@@ -43,6 +43,17 @@ public class HospitalController {
 
     }
 
+    //주변 거리 까지 던한 주변 병원 검색
+    @GetMapping("/gethospitals2")
+    public ResponseEntity<List<Hospital>> getHospitals2(@RequestParam double x, @RequestParam double y,@RequestParam Long m){
+        log.debug("getHospitals 접근 x:{} y:{}",x,y);
+        List<Hospital> hospitals=hospitalService.getHospitals2(x,y,m);
+        log.debug("주변 병원 count {}",hospitals.size());
+
+        return ResponseEntity.ok(hospitals);
+
+    }
+
 
     @GetMapping("/save")
     public String getHospitals(@RequestParam int x) throws URISyntaxException {

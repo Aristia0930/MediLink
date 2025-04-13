@@ -6,6 +6,11 @@ spring:
   data:
     mongodb:
       uri: ${MONGO_URI}
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+    serialization:
+      write-dates-as-timestamps: false
 
 logging:
   level:

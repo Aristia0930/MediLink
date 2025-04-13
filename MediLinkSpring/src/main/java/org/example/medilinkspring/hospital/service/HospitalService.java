@@ -124,4 +124,23 @@ public class HospitalService {
     }
 
 
+    public List<Hospital> getHospitals2(double x, double y, Long m) {
+        double range=0.000009*m;
+        double minLat=y-range;
+        double maxLat=y+range;
+
+        double minLon=x-range;
+        double maxLon=x+range;
+        if (122> x || x>133 || 30>y || y>39){
+            throw new HospitalException(ErrorCode.COORDINATE_NOT_KOREA);
+        }
+
+        try {
+            List<Hospital> hospitals=hospitalRepository.findHospitalsInRange(minLat,maxLat,minLon,maxLon);
+        }catch (Exception e){
+            throw new HospitalException(ErrorCode.HOSPITAL_NOT_FOUND,e);
+        }
+
+        return hospitalRepository.findHospitalsInRange(minLat,maxLat,minLon,maxLon);
+    }
 }

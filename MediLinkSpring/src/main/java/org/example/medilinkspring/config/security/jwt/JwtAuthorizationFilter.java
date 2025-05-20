@@ -32,11 +32,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (request.getRequestURI().startsWith("/idcheck")||request.getRequestURI().startsWith("/join")||request.getRequestURI().startsWith("/login")) {
-
-            chain.doFilter(request, response);
-            return;
-        }
+//        if (request.getRequestURI().startsWith("/idcheck")||request.getRequestURI().startsWith("/join")||request.getRequestURI().startsWith("/login")) {
+//
+//            chain.doFilter(request, response);
+//            return;
+//        }
         System.out.println("인증 권한 요구된 요청입니다.");
         log.debug("인증 요구 접근");
 //        super.doFilterInternal(request, response, chain);

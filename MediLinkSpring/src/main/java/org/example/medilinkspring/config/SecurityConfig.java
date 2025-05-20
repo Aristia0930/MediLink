@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated() // 그 외 요청은 인증 필요
                 )
                 .addFilterAt(new JwtAuthenticationFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtAuthorizationFilter(authenticationManager(authenticationConfiguration),userRepository),JwtAuthenticationFilter.class)
+                .addFilterAt(new JwtAuthorizationFilter(authenticationManager(authenticationConfiguration),userRepository),JwtAuthenticationFilter.class)
 //                .addFilterBefore(new JwtAuthorizationFilter(authenticationManager(authenticationConfiguration),userRepository),JwtAuthenticationFilter.class)
                 .build();
 
